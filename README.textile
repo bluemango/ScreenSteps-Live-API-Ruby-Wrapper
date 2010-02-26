@@ -1,0 +1,41 @@
+h1. ScreenStepsLive API Ruby Wrapper
+
+h2. Usage
+
+This library users ActiveResource to interact with the ScreenSteps Live API.
+
+To setup do the following:
+
+<pre>
+  require 'screenstepslive_api'
+  ScreenStepsLiveAPI.account = 'youraccount'
+  ScreenStepsLiveAPI.user = 'username'
+  ScreenStepsLiveAPI.password = 'your_password'
+</pre>
+
+All manuals, buckets and lessons are retrieved via Spaces. You can pass in the space id.
+
+<pre>space = ScreenStepsLiveAPI::Space.find(:first)</pre>
+ 
+OR if your permalink is "mypermalink"
+
+<pre>space = ScreenStepsLiveAPI::Space.find("mypermalink")</pre>
+
+<code>space.assets</code> gives you all of the assets (Dividers, Manuals, Buckets) for a space
+
+<pre>asset = space.assets.first</pre>
+
+<code>asset.asset_type</code> returns the asset type. 
+
+If it is a manual then we can call:
+
+<pre>manual = space.manual(asset.id)</pre>
+
+Then we can get the first lesson like so:
+
+<pre>
+  lesson_id = manual.chapters.first.lessons.first.id
+  mnaual.lesson(lesson_id)
+</pre>
+
+Same method works for buckets.
