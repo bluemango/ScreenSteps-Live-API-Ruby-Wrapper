@@ -35,7 +35,52 @@ Then we can get the first lesson like so:
 
 <pre>
   lesson_id = manual.chapters.first.lessons.first.id
-  mnaual.lesson(lesson_id)
+  manual.lesson(lesson_id)
 </pre>
 
 Same method works for buckets.
+
+h3. Searching
+
+To search just find the space, bucket or manual you want to search and do the following:
+
+<pre>
+  space.search("search string")
+  manual.search("search string")
+  bucket.search("search string")
+</pre>
+
+h3. Getting Tagged Lessons
+
+You can do the same for tags
+
+<pre>
+  space.lessons_for_tag("Tag name")
+  manual.lessons_for_tag("Tag name")
+  bucket.lessons_for_tag("Tag name")
+</pre>
+
+h3. Displaying a Lesson
+
+To display the contents of a lesson. First find the space and manual/bucket the lesson is in.
+
+<pre>
+  space = ScreenStepsLiveAPI::Space.find('space_id')
+  bucket = space.bucket(space.assets.first.id)
+  lesson = bucket.lesson(bucket.lessons.first.id)
+</pre>
+
+Now you can iterate over the lesson to display the contents. HAML output might look like this:
+
+<pre>
+  %h1= lesson.title
+  .lesson_description= lesson.description
+  - lesson.steps.each do |step|
+    %h2= step.title
+    .lesson_step
+      = step.instructions
+      - if step.media
+        .image
+          = image_tag(step.media.url, :width => step.media.width, :height => step.media.height)
+
+</pre>
