@@ -35,7 +35,7 @@ module ScreenStepsLiveAPI
   
   self.host_format = '%s://%s/%s'
   self.domain_format = '%s.screenstepslive.com'
-  self.protocol = 'http'
+  self.protocol = 'https'
   
   class Base < ActiveResource::Base
     def self.inherited(base)
@@ -45,6 +45,7 @@ module ScreenStepsLiveAPI
         attr_accessor :path
       end
       base.site_format = '%s'
+      self.format = ActiveResource::Formats::XmlFormat
       super
     end
   end
