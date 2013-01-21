@@ -30,7 +30,13 @@ module ScreenStepsLiveAPI
     def resources
       @resources ||= []
     end
-  
+    
+    def setup
+      settings = YAML.load_file("#{Rails.root}/config/sslive_api.yml").symbolize_keys
+      self.account = settings[:account]
+      self.user = settings[:user]
+      self.password = settings[:password]
+    end
   end
   
   self.host_format = '%s://%s/%s'
@@ -45,7 +51,6 @@ module ScreenStepsLiveAPI
         attr_accessor :path
       end
       base.site_format = '%s'
-      self.format = ActiveResource::Formats::XmlFormat
       super
     end
   end
@@ -104,39 +109,6 @@ module ScreenStepsLiveAPI
     
   end
   
-  class Bucket < Base
-    self.path = "spaces/:space_id"
-
-    attr_accessor :space_id
-
-    def lesson(id)
-      lesson = BucketLesson.find(id, :params => { :space_id => space_id, :bucket_id => self.id })
-      lesson.space_id = self.space_id
-      lesson.bucket_id = self.id
-      lesson
-    end
-    
-    def search(text, options = {})
-      get('searches', {:text => text}.merge(options) )
-    end
-    
-    def lessons_for_tag(tag_name)
-      get('tags', :tag => tag_name)
-    end
-    
-    
-  end
-  
-  class BucketLesson < Base
-    attr_accessor :space_id, :manual_id
-    self.path = "spaces/:space_id/buckets/:bucket_id"    
-    self.element_name = "lesson"
-  end
-  
-  class Task < Base
-    attr_accessor :space_id
-    self.path = "spaces/:space_id"
-  end
 end
 
 
@@ -147,26 +119,37 @@ ScreenStepsLiveAPI.account = 'youraccount'
 ScreenStepsLiveAPI.user = 'username'
 ScreenStepsLiveAPI.password = 'your_password'
  
-space = ScreenStepsLiveAPI::Space.find(:first)
-
-OR if your permalink is "mypermalink"
-
-space = ScreenStepsLiveAPI::Space.find("mypermalink")
-
-space.assets gives you all of the assets (Dividers, Manuals, Buckets) for a space
-
-asset = space.assets.first
-
-asset.asset_type returns the asset type. 
-
-If it is a manual then we can call:
-
-manual = space.manual(asset.id)
-
-Then we can get the first lesson like so:
-
-lesson_id = manual.chapters.first.lessons.first.id
-
-mnaual.lesson(lesson_id)
-
-Same method works for buckets.
+# this will only give you the id of the space, not its contents
+ 
+s = ScreenStepsLiveAPI::Space.find(:first)
+ 
+# now load the contents
+ 
+s = ScreenStepsLiveAPI::Space.find(s.id)
+ 
+# load the first manual
+ 
+manual_id = s.manuals.first.id
+m = s.manual(manual_id)
+ 
+# load the first lesson. Lessons are in chapters in a manual.
+ 
+lesson_id = m.chapters.first.lessons.first.id
+l = m.lesson(lesson_id)
+ 
+# if you already know the lesson_id, space_id and manual_id then you can do this:
+ 
+l = ScreenStepsLiveAPI::Lesson.find(lesson_id, :params => {:space_id => space_id, :manual_id => manual_id})
+ 
+# You would then want to iterate over the lesson contents using your own html tags. 
+# Here are the attributes you would use
+ 
+l.title
+l.description
+l.steps.each do |step|
+  step.title
+  step.instructions
+  step.media.url
+  step.media.width
+  step.media.height
+end

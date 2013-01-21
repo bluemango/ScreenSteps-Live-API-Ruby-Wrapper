@@ -13,7 +13,7 @@ To setup do the following:
   ScreenStepsLiveAPI.password = 'your_password'
 </pre>
 
-All manuals, buckets and lessons are retrieved via Spaces. You can pass in the space id.
+All manuals and lessons are retrieved via Spaces. You can pass in the space id.
 
 <pre>space = ScreenStepsLiveAPI::Space.find(:first)</pre>
  
@@ -38,16 +38,14 @@ Then we can get the first lesson like so:
   manual.lesson(lesson_id)
 </pre>
 
-Same method works for buckets.
 
 h3. Searching
 
-To search just find the space, bucket or manual you want to search and do the following:
+To search just find the space or manual you want to search and do the following:
 
 <pre>
   space.search("search string")
   manual.search("search string")
-  bucket.search("search string")
 </pre>
 
 h3. Getting Tagged Lessons
@@ -57,17 +55,22 @@ You can do the same for tags
 <pre>
   space.lessons_for_tag("Tag name")
   manual.lessons_for_tag("Tag name")
-  bucket.lessons_for_tag("Tag name")
 </pre>
 
 h3. Displaying a Lesson
 
-To display the contents of a lesson. First find the space and manual/bucket the lesson is in.
+To display the contents of a lesson. First find the space and manual the lesson is in.
 
 <pre>
   space = ScreenStepsLiveAPI::Space.find('space_id')
-  bucket = space.bucket(space.assets.first.id)
-  lesson = bucket.lesson(bucket.lessons.first.id)
+  manual = space.manual(space.manuals.first.id)
+  lesson = manual.lesson(manual.chapters.first.lessons.first.id)
+</pre>
+
+Or if you already know the space_id, manual_id and lesson_id:
+
+<pre>
+  lesson = ScreenStepsLiveAPI::Lesson.find(lesson_id, :params => {:space_id => space_id, :manual_id => manual_id})
 </pre>
 
 Now you can iterate over the lesson to display the contents. HAML output might look like this:
